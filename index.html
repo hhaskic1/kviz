@@ -1,11 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hr">
 <head>
   <meta charset="UTF-8">
-  <title>kviz-aplikacija</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kviz znanja</title>
+  <style>
+    body { font-family: Arial; padding: 30px; max-width: 700px; margin: auto; }
+    .pitanje { margin-bottom: 20px; }
+    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
+    #rezultat { font-weight: bold; margin-top: 30px; color: darkgreen; }
+    .pregled { margin-top: 20px; font-size: 15px; color: #444; }
+  </style>
 </head>
 <body>
-  <script src="kviz.js"></script>
+  <h1>Kviz znanja: Provjera osnovnog znanja</h1>
+
+  <div id="kviz"></div>
+  <button onclick="zavrsiKviz()">Završi kviz</button>
+  <div id="rezultat"></div>
+  <div class="pregled" id="pregled"></div>
+
+  <script>
+    const pitanja = [
+      {
+        tekst: "Koja je formula za površinu kruga?",
+        opcije: ["2πr", "πr^2", "πd"],
+        tacan: "πr^2"
+      },
+      {
+        tekst: "Koji element ima hemijski simbol 'O'?",
+        opcije: ["Osmijum", "Kiseonik", "Zlato"],
+        tacan: "Kiseonik"
+      },
+      {
+        tekst: "Koliko kontinenata ima na svijetu?",
+        opcije: ["5", "6", "7"],
+        tacan: "7"
+      }
+    ];
+
+    const odgovori = {};
+
+    function prikaziPitanja() {
+      const kviz = document.getElementById("kviz");
+      pitanja.forEach((pitanje, index) => {
+        const div = document.createElement("div");
+        div.className = "pitanje";
+
+        let html = `<p><strong>${index + 1}. ${pitanje.tekst}</strong></p>`;
+        pitanje.opcije.forEach(opcija => {
+          html += `<label><input type="radio" name="p${index}" value="${opcija}" onchange="sacuvajOdgovor(${index}, '${opcija}')"> ${opcija}</label><br>`;
+        });
+
+        div.innerHTML = html;
+        kviz.appendChild(div);
+      });
+    }
+
+    function sacuvajOdgovor(index, vrijednost) {
+      odgovori[index] = vrijednost;
+    }
+
+    function zavrsiKviz() {
+      let tacno = 0;
+      let pregled = "<h3>Pregled odgovora:</h3><ul>";
+
+      pitanja.forEach((pitanje, index) => {
+        const korisnicki = odgovori[index];
+        const jeTacno = korisnicki === pitanje.tacan;
+        if (jeTacno) tacno++;
+
+        pregled += `<li>
+          <strong>${pitanje.tekst}</strong><br>
+          Tvoj odgovor: ${korisnicki || "(nije odgovoreno)"}<br>
+          Tačan odgovor: ${pitanje.tacan}
+        </li><br>`;
+      });
+
+      pregled += "</ul>";
+      document.getElementById("rezultat").innerText = `Ukupno tačnih odgovora: ${tacno} od ${pitanja.length}`;
+      document.getElementById("pregled").innerHTML = pregled;
+    }
+
+    prikaziPitanja();
+  </script>
 </body>
 </html>
